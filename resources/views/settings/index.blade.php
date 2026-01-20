@@ -140,7 +140,7 @@
                         <h2 class="text-xl font-black text-slate-900">Homepage Stats & Customization</h2>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
                         <div class="space-y-4 text-center p-8 bg-slate-50 rounded-[2rem]">
                             <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Experience Years</label>
                             <input type="number" name="experience_count" value="{{ $settings->experience_count }}" class="w-full text-center bg-transparent text-3xl font-black text-[#0F4A3B] outline-none">
@@ -160,6 +160,15 @@
                             <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Trips Completed</label>
                             <input type="number" name="trip_count" value="{{ $settings->trip_count }}" class="w-full text-center bg-transparent text-3xl font-black text-[#0F4A3B] outline-none">
                             <p class="text-[10px] font-bold text-slate-400">Successful Journeys</p>
+                        </div>
+
+                        <div class="space-y-4 text-center p-8 bg-slate-50 rounded-[2rem]">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Panel Theme Color</label>
+                            <div class="flex items-center justify-center gap-4">
+                                <input type="color" name="primary_color" value="{{ $settings->primary_color ?? '#0F4A3B' }}" class="w-12 h-12 rounded-xl cursor-pointer border-none bg-transparent">
+                                <input type="text" value="{{ $settings->primary_color ?? '#0F4A3B' }}" class="text-xl font-black text-[#0F4A3B] bg-transparent w-24 outline-none" readonly>
+                            </div>
+                            <p class="text-[10px] font-bold text-slate-400">Choose Primary Color</p>
                         </div>
                     </div>
                 </div>

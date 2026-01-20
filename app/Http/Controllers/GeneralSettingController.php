@@ -30,6 +30,7 @@ class GeneralSettingController extends Controller
             'destination_count' => 'nullable|integer',
             'customers_count' => 'nullable|integer',
             'trip_count' => 'nullable|integer',
+            'primary_color' => 'nullable|string|max:7',
         ]);
 
         $data = $request->except(['logo', 'footer_logo']);

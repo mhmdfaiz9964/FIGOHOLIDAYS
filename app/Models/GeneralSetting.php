@@ -20,6 +20,7 @@ class GeneralSetting extends Model
         'destination_count',
         'customers_count',
         'trip_count',
+        'primary_color',
     ];
 
     protected $casts = [

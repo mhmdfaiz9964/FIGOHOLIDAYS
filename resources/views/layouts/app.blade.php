@@ -14,6 +14,10 @@
 
         <!-- Scripts -->
         <script src="https://cdn.tailwindcss.com"></script>
+        @php 
+            $siteSettings = \App\Models\GeneralSetting::first();
+            $primaryColor = $siteSettings->primary_color ?? '#0F4A3B';
+        @endphp
         <script>
             tailwind.config = {
                 theme: {
@@ -23,8 +27,8 @@
                         },
                         colors: {
                             brand: {
-                                green: '#0F4A3B',
-                                greenLight: '#1A6B56',
+                                green: '{{ $primaryColor }}',
+                                greenLight: '{{ $primaryColor }}CC', // Added transparency
                             }
                         }
                     }
@@ -34,12 +38,28 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         
         <style>
+            :root {
+                --primary-color: {{ $primaryColor }};
+            }
             body {
                 font-family: 'Plus Jakarta Sans', sans-serif;
                 margin: 0;
                 padding: 0;
             }
             [x-cloak] { display: none !important; }
+            
+            /* Dynamic Color Overrides */
+            .bg-\[\#0F4A3B\] { background-color: var(--primary-color) !important; }
+            .text-\[\#0F4A3B\] { color: var(--primary-color) !important; }
+            .border-\[\#0F4A3B\] { border-color: var(--primary-color) !important; }
+            .shadow-\[\#0F4A3B\/20\] { --tw-shadow-color: {{ $primaryColor }}33; }
+            .hover\:text-\[\#0F4A3B\]:hover { color: var(--primary-color) !important; }
+            .hover\:bg-\[\#0F4A3B\]:hover { background-color: var(--primary-color) !important; }
+            .focus\:border-\[\#0F4A3B\/20\]:focus { border-color: {{ $primaryColor }}33 !important; }
+            .active-nav-item {
+                background-color: var(--primary-color) !important;
+                color: white !important;
+            }
             
             /* Robust Layout Fallback */
             .layout-wrapper {
