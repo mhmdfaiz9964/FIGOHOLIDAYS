@@ -23,7 +23,7 @@ class DashboardController extends Controller
             'restaurants' => Restaurant::count(),
         ];
 
-        $recentOffers = Offer::with('offerCategory')->latest()->take(5)->get();
+        $recentOffers = Offer::with('category')->latest()->take(5)->get();
         $recentReviews = Review::latest()->take(5)->get();
 
         return view('dashboard', compact('stats', 'recentOffers', 'recentReviews'));

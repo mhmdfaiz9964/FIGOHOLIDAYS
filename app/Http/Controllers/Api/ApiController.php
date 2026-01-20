@@ -50,8 +50,17 @@ class ApiController extends Controller
     public function heroes()
     {
         $heroes = HomePageHero::all()->map(function($hero) {
-            $hero->image = $this->getFullUrl($hero->image);
-            return $hero;
+            return [
+                'tag' => $hero->tag,
+                'title' => $hero->title,
+                'highlighted_title' => $hero->highlighted_title,
+                'description' => $hero->description,
+                'background_image' => $this->getFullUrl($hero->background_image),
+                'btn1_text' => $hero->btn1_text,
+                'btn1_url' => $hero->btn1_url,
+                'btn2_text' => $hero->btn2_text,
+                'btn2_url' => $hero->btn2_url,
+            ];
         });
         return response()->json($heroes);
     }
@@ -59,8 +68,10 @@ class ApiController extends Controller
     public function partners()
     {
         $partners = Partner::all()->map(function($partner) {
-            $partner->image = $this->getFullUrl($partner->image);
-            return $partner;
+            return [
+                'name' => $partner->name,
+                'image' => $this->getFullUrl($partner->image),
+            ];
         });
         return response()->json($partners);
     }
@@ -68,8 +79,12 @@ class ApiController extends Controller
     public function categories()
     {
         $categories = OfferCategory::all()->map(function($cat) {
-            $cat->image = $this->getFullUrl($cat->image);
-            return $cat;
+            return [
+                'id' => $cat->id,
+                'title' => $cat->title,
+                'description' => $cat->sub_heading,
+                'image' => $this->getFullUrl($cat->banner_image),
+            ];
         });
         return response()->json($categories);
     }
@@ -98,6 +113,17 @@ class ApiController extends Controller
                 return $this->getFullUrl($img);
             }, $offer->gallery_images);
         }
+
+        if ($offer->itineraries) {
+            $offer->itineraries->transform(function($itinerary) {
+                if (is_array($itinerary->images)) {
+                    $itinerary->images = array_map(function($img) {
+                        return $this->getFullUrl($img);
+                    }, $itinerary->images);
+                }
+                return $itinerary;
+            });
+        }
         
         return $offer;
     }
@@ -105,8 +131,21 @@ class ApiController extends Controller
     public function hotels()
     {
         $hotels = Hotel::with('hotelType')->latest()->get()->map(function($hotel) {
-            $hotel->image = $this->getFullUrl($hotel->image);
-            return $hotel;
+            return [
+                'id' => $hotel->id,
+                'name' => $hotel->name,
+                'description' => $hotel->meta_description,
+                'image' => $this->getFullUrl($hotel->image),
+                'location' => $hotel->location,
+                'category' => $hotel->hotel_type_id, // Keep ID for matching if needed
+                'hotel_type' => [
+                    'title' => $hotel->hotelType ? $hotel->hotelType->name : 'فنادق 5 نجوم'
+                ],
+                'stars' => (int)$hotel->rating,
+                'pricePerNight' => (float)$hotel->price_per_night,
+                'currency' => '$',
+                'amenities' => $hotel->activities ?: [],
+            ];
         });
         return response()->json($hotels);
     }
@@ -146,8 +185,16 @@ class ApiController extends Controller
     public function reviews()
     {
         $reviews = Review::latest()->get()->map(function($rev) {
-            $rev->user_image = $this->getFullUrl($rev->user_image);
-            return $rev;
+            return [
+                'id' => $rev->id,
+                'author' => $rev->user_name,
+                'user_image' => $this->getFullUrl($rev->user_image),
+                'location' => $rev->user_location,
+                'rating' => (int)$rev->rating,
+                'comment' => $rev->description,
+                'source' => $rev->source ?: 'TripAdvisor',
+                'date' => $rev->date ? $rev->date->format('F Y') : null,
+            ];
         });
         return response()->json($reviews);
     }
@@ -160,8 +207,16 @@ class ApiController extends Controller
     public function transportations()
     {
         $trans = Transportation::latest()->get()->map(function($item) {
-            $item->image = $this->getFullUrl($item->image);
-            return $item;
+            return [
+                'id' => $item->id,
+                'name' => $item->title,
+                'type' => $item->vehicle_type,
+                'image' => $this->getFullUrl($item->vehicle_image),
+                'pricePerDay' => $item->starting_price,
+                'seats' => $item->seats ?? 4, // Default if not in DB
+                'bags' => $item->bags ?? 2,   // Default if not in DB
+                'includes' => $item->includes,
+            ];
         });
         return response()->json($trans);
     }

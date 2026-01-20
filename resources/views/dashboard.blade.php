@@ -91,7 +91,7 @@
                                 @foreach($recentOffers as $offer)
                                     <tr class="group hover:bg-slate-50/50 transition-colors">
                                         <td class="px-6 py-4 font-bold text-slate-700 text-sm">{{ $offer->title }}</td>
-                                        <td class="px-6 py-4 text-xs font-bold text-slate-400">{{ $offer->offerCategory->name }}</td>
+                                        <td class="px-6 py-4 text-xs font-bold text-slate-400">{{ $offer->category->name ?? 'N/A' }}</td>
                                         <td class="px-6 py-4 text-right">
                                             <a href="{{ route('offers.edit', $offer) }}" class="text-[#0F4A3B] hover:opacity-70">
                                                 <svg class="w-4 h-4 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
