@@ -157,9 +157,16 @@ class ApiController extends Controller
         return response()->json($hotel);
     }
 
-    public function destinations()
+    public function destinations(Request $request)
     {
-        $destinations = Destination::with('province')->latest()->get()->map(function($dest) {
+        $query = Destination::with('province');
+        
+        // Filter by province_id if provided
+        if ($request->filled('province_id')) {
+            $query->where('province_id', $request->province_id);
+        }
+        
+        $destinations = $query->latest()->get()->map(function($dest) {
             $dest->image = $this->getFullUrl($dest->image);
             return $dest;
         });
@@ -173,9 +180,16 @@ class ApiController extends Controller
         return response()->json($dest);
     }
 
-    public function restaurants()
+    public function restaurants(Request $request)
     {
-        $restaurants = Restaurant::latest()->get()->map(function($res) {
+        $query = Restaurant::query();
+        
+        // Filter by type (cuisine type) if provided
+        if ($request->filled('type')) {
+            $query->where('type', 'like', '%' . $request->type . '%');
+        }
+        
+        $restaurants = $query->latest()->get()->map(function($res) {
             $res->image = $this->getFullUrl($res->image);
             return $res;
         });
