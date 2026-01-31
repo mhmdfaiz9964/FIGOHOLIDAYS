@@ -1,99 +1,150 @@
-# Figo Holidays - API Documentation
+# Figo Holidays - API Documentation v1.1
 
-This API provides read-only access to all content managed via the Figo Holidays Admin Panel. All endpoints return JSON data and include full URLs for all image assets.
+This API provides read-only access to all content managed via the Figo Holidays Admin Panel. All endpoints return JSON data and include absolute URLs for all image assets.
 
 **Base URL:** `{{your-domain}}/api/v1`
 
 ---
 
-## 🛠️ General Endpoints
-
-### 1. Site Settings
-
-`GET /settings`
-Returns global branding, multiple contact details, social links, and the dynamic theme color.
-
-### 2. Visa Information
-
-`GET /visa`
-Returns the singleton visa page content including hero background and procedure card images.
-
-### 3. Homepage Heroes (Banners)
+## 🏠 Home Page (Main Banner)
 
 `GET /heroes`
-Returns a list of all banner images and their titles.
 
-### 4. Partners & Corporate Clients
+Returns the single home page design configuration. This endpoint is now optimized for a dynamic background slider and custom typography.
 
-`GET /partners`
-Returns all partner logos and information.
-
----
-
-## 🗺️ Travel & Listings
-
-### 5. Offer Categories
-
-`GET /categories`
-Returns categories like "Luxury Tours", "Family Holidays", etc.
-
-### 6. Travel Offers
-
-- **List all**: `GET /offers`
-- **Show one**: `GET /offers/{id}`
-  Includes related category, package types, and full daily itinerary.
-
-### 7. Hotels & Accommodations
-
-- **List all**: `GET /hotels`
-- **Show one**: `GET /hotels/{id}`
-  Includes hotel types and the JSON list of activities/amenities.
-
-### 8. Destinations
-
-- **List all**: `GET /destinations`
-- **Show one**: `GET /destinations/{id}`
-  Includes the related province and detailed description.
-
----
-
-## 🍽️ Services & Social
-
-### 9. Restaurants
-
-`GET /restaurants`
-Returns list of recommended dining locations with ratings and images.
-
-### 10. Transportation
-
-`GET /transportations`
-Returns vehicle types and transportation services.
-
-### 11. Guest Reviews
-
-`GET /reviews`
-Returns customer feedback, star ratings, and user profile images.
-
-### 12. FAQs
-
-`GET /faqs`
-Returns frequently asked questions and their answers.
-
----
-
-## 🖼️ Image Handling
-
-All images are returned as absolute URLs.
-Example output:
+### Response Structure:
 
 ```json
 {
-    "logo": "http://127.0.0.1:8000/storage/settings/logo.png",
-    "image": "http://127.0.0.1:8000/storage/offers/cover.jpg"
+    "tag": "Exclusive 2026 Offers",
+    "tag_size": "14",
+    "title": "Sri Lanka through",
+    "title_size": "45",
+    "highlighted_title": "Arab lensan",
+    "highlight_size": "45",
+    "description": "Luxury trips designed specifically for the Gulf traveler.",
+    "description_size": "16",
+    "background_image": "http://.../storage/heroes/backgrounds/poster.jpg",
+    "background_images": [
+        "http://.../storage/heroes/slider/bg1.jpg",
+        "http://.../storage/heroes/slider/bg2.jpg"
+    ],
+    "btn1_text": "Free consultation",
+    "btn1_url": "https://...",
+    "btn1_icon": "http://.../storage/heroes/icons/icon1.png",
+    "btn2_text": "Browse programs",
+    "btn2_url": "https://...",
+    "btn2_icon": "http://.../storage/heroes/icons/icon2.png"
+}
+```
+
+_Note: Font sizes are returned as raw pixel values (0-100)._
+
+---
+
+## � Transportation Page
+
+`GET /transportation-page`
+
+Returns the content for the transportation landing page/menu.
+
+### Response Structure:
+
+```json
+{
+    "id": 1,
+    "main_title": "Car Rental with Driver",
+    "main_subtitle": "Starting from $60 in Sri Lanka",
+    "image_01": "http://.../storage/transportation/banner1.jpg",
+    "image_02": "http://.../storage/transportation/banner2.jpg",
+    "faqs": [
+        {
+            "question": "Are fuel costs included?",
+            "answer": "Yes, fuel and driver charges are included."
+        },
+        {
+            "question": "Can we change the route?",
+            "answer": "Yes, routes can be customized upon request."
+        }
+    ]
 }
 ```
 
 ---
 
-© 2026 APEX WEB INNOVATION.
+## 📍 Destinations
+
+- **List all**: `GET /destinations`
+- **Show one**: `GET /destinations/{id}`
+
+### Response Structure:
+
+```json
+{
+    "id": 5,
+    "name": "Kandy",
+    "image": "http://.../storage/destinations/kandy.jpg",
+    "province_id": 2,
+    "label": "Heritage City",
+    "description": "The cultural capital of Sri Lanka...",
+    "attractions": [
+        {
+            "title": "Temple of the Tooth",
+            "image": "http://.../storage/destinations/attractions/temple.jpg"
+        },
+        {
+            "title": "Royal Botanical Gardens",
+            "image": "http://.../storage/destinations/attractions/gardens.jpg"
+        }
+    ],
+    "province": {
+        "id": 2,
+        "name": "Central Province"
+    }
+}
+```
+
+---
+
+## 🚗 Transportation List (Fleet)
+
+`GET /transportations`
+
+Returns the list of available vehicles and fleet details.
+
+### Response Structure:
+
+```json
+[
+    {
+        "id": 1,
+        "name": "Luxury Sedan",
+        "type": "Car",
+        "image": "http://.../storage/transportation/vehicles/sedan.png",
+        "pricePerDay": "65",
+        "seats": 4,
+        "bags": 2,
+        "includes": ["Driver", "Insurance", "Fuel"]
+    }
+]
+```
+
+---
+
+## �️ General Information
+
+### Image URLs
+
+All images are returned as absolute URLs pointing to the public storage.
+`Example: http://domain.com/storage/path/to/image.jpg`
+
+### Data Casting
+
+- `faqs`, `attractions`, and `background_images` are returned as native JSON arrays.
+- Font sizes in the Home Page object are strings representing numeric pixel values.
+
+---
+
+© 2026 FIGO HOLIDAYS
+**Documentation Updated:** Jan 31, 2026
 **Lead Dev:** MHMD Faiz

@@ -19,4 +19,5 @@ Route::prefix('v1')->group(function () {
     Route::get('/reviews', [ApiController::class, 'reviews']);
     Route::get('/faqs', [ApiController::class, 'faqs']);
     Route::get('/transportations', [ApiController::class, 'transportations']);
+    Route::get('/transportation-page', [ApiController::class, 'transportationPage']);
 });

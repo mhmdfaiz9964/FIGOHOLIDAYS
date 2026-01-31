@@ -18,5 +18,16 @@ class HomePageHero extends Model
         'btn2_text',
         'btn2_url',
         'btn2_icon',
+        'tag_size',
+        'title_size',
+        'highlight_size',
+        'description_size',
+        'order_index',
+        'status',
+        'background_images',
+    ];
+
+    protected $casts = [
+        'background_images' => 'array',
     ];
 }

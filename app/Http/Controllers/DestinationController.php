@@ -43,11 +43,23 @@ class DestinationController extends Controller
         try {
             DB::beginTransaction();
 
-            $data = $request->except('image');
+            $data = $request->except(['image', 'attractions']);
 
             if ($request->hasFile('image')) {
                 $data['image'] = $request->file('image')->store('destinations', 'public');
             }
+
+            $attractions = [];
+            if ($request->has('attractions')) {
+                foreach ($request->attractions as $index => $attraction) {
+                    $item = ['title' => $attraction['title'], 'image' => null];
+                    if ($request->hasFile("attractions.{$index}.image")) {
+                        $item['image'] = $request->file("attractions.{$index}.image")->store('destinations/attractions', 'public');
+                    }
+                    $attractions[] = $item;
+                }
+            }
+            $data['attractions'] = $attractions;
 
             Destination::create($data);
 
@@ -80,12 +92,27 @@ class DestinationController extends Controller
         try {
             DB::beginTransaction();
 
-            $data = $request->except(['image', '_method', '_token']);
+            $data = $request->except(['image', '_method', '_token', 'attractions']);
 
             if ($request->hasFile('image')) {
                 if ($destination->image) Storage::disk('public')->delete($destination->image);
                 $data['image'] = $request->file('image')->store('destinations', 'public');
             }
+
+            $attractions = [];
+            if ($request->has('attractions')) {
+                foreach ($request->attractions as $index => $attraction) {
+                    $item = ['title' => $attraction['title'], 'image' => null];
+                    
+                    if ($request->hasFile("attractions.{$index}.image")) {
+                        $item['image'] = $request->file("attractions.{$index}.image")->store('destinations/attractions', 'public');
+                    } elseif (isset($attraction['old_image'])) {
+                        $item['image'] = $attraction['old_image'];
+                    }
+                    $attractions[] = $item;
+                }
+            }
+            $data['attractions'] = $attractions;
 
             $destination->update($data);
 

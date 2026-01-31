@@ -16,7 +16,7 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('users', \App\Http\Controllers\UserController::class);
     
-    // Single Banner Management
+    // Main Banner Designer (Single Page with Multi-BG)
     Route::get('heroes', [\App\Http\Controllers\HeroController::class, 'index'])->name('heroes.index');
     Route::post('heroes', [\App\Http\Controllers\HeroController::class, 'store'])->name('heroes.store');
 
@@ -24,6 +24,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('offer-categories', \App\Http\Controllers\OfferCategoryController::class);
     Route::resource('offers', \App\Http\Controllers\OfferController::class);
     Route::resource('transportations', \App\Http\Controllers\TransportationController::class);
+    Route::get('transportation-page', [\App\Http\Controllers\TransportationPageController::class, 'edit'])->name('transportations.page.edit');
+    Route::post('transportation-page', [\App\Http\Controllers\TransportationPageController::class, 'update'])->name('transportations.page.update');
     Route::resource('faqs', \App\Http\Controllers\FaqController::class);
     Route::resource('restaurants', \App\Http\Controllers\RestaurantController::class);
     Route::resource('destinations', \App\Http\Controllers\DestinationController::class);

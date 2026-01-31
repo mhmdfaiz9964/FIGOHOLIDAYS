@@ -47,18 +47,41 @@
                         </div>
                     </div>
 
-                    <!-- Attractions -->
                     <div class="pt-6 border-t border-slate-50 space-y-6">
                         <div class="flex items-center justify-between px-1">
                             <h3 class="text-xs font-black text-[#0F4A3B] uppercase tracking-widest">Top Tourist Attractions</h3>
                             <button type="button" @click="addAttraction()" class="text-[10px] font-black uppercase text-[#0F4A3B] hover:opacity-70">+ Add Attraction</button>
                         </div>
                         
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-4">
                             <template x-for="(attraction, index) in attractions" :key="index">
-                                <div class="flex gap-2 p-2 bg-slate-50 rounded-2xl">
-                                    <input type="text" name="attractions[]" x-model="attractions[index]" class="flex-1 px-4 py-2 bg-white rounded-xl text-sm font-bold outline-none">
-                                    <button type="button" @click="removeAttraction(index)" class="p-2 text-rose-500 hover:bg-rose-50 rounded-xl transition-all">&times;</button>
+                                <div class="flex flex-col md:flex-row gap-4 p-4 bg-slate-50 rounded-2xl animate-in slide-in-from-top-2">
+                                    <div class="flex-1 space-y-2">
+                                        <label class="text-[10px] font-black text-slate-400 uppercase">Attraction Name</label>
+                                        <input type="text" :name="'attractions['+index+'][title]'" x-model="attraction.title" class="w-full px-4 py-2 bg-white rounded-xl text-sm font-bold outline-none" placeholder="e.g. Temple of the Tooth">
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label class="text-[10px] font-black text-slate-400 uppercase">Image</label>
+                                        <div class="relative w-full md:w-32 h-20 bg-white rounded-xl border border-dashed border-slate-200 flex items-center justify-center overflow-hidden">
+                                            <input type="file" :name="'attractions['+index+'][image]'" @change="previewAttraction($event, index)" class="absolute inset-0 opacity-0 cursor-pointer z-10">
+                                            <input type="hidden" :name="'attractions['+index+'][old_image]'" x-model="attraction.image">
+                                            
+                                            <template x-if="attraction.preview">
+                                                <img :src="attraction.preview" class="w-full h-full object-cover">
+                                            </template>
+                                            
+                                            <template x-if="!attraction.preview && attraction.image">
+                                                <img :src="'/storage/' + attraction.image" class="w-full h-full object-cover">
+                                            </template>
+
+                                            <template x-if="!attraction.preview && !attraction.image">
+                                                <svg class="w-6 h-6 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                                            </template>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-end">
+                                        <button type="button" @click="removeAttraction(index)" class="p-2.5 text-rose-500 hover:bg-rose-50 rounded-xl transition-all">&times;</button>
+                                    </div>
                                 </div>
                             </template>
                         </div>
@@ -132,12 +155,25 @@
             return {
                 showProvinceModal: false,
                 newProvinceName: '',
-                attractions: {!! json_encode($destination->attractions ?? ['']) !!},
+                attractions: {!! json_encode(array_map(function($attraction) {
+                    if (is_string($attraction)) {
+                        return ['title' => $attraction, 'image' => null, 'preview' => null];
+                    }
+                    $attraction['preview'] = null;
+                    return $attraction;
+                }, $destination->attractions ?? [])) !!},
                 preview: null,
 
-                addAttraction() { this.attractions.push(''); },
+                addAttraction() { this.attractions.push({ title: '', image: null, preview: null }); },
                 removeAttraction(index) { this.attractions.splice(index, 1); },
                 
+                previewAttraction(e, index) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        this.attractions[index].preview = URL.createObjectURL(file);
+                    }
+                },
+
                 previewMedia(e) {
                     const file = e.target.files[0];
                     if (file) this.preview = URL.createObjectURL(file);

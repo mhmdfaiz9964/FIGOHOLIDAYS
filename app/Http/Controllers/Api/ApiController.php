@@ -49,20 +49,29 @@ class ApiController extends Controller
 
     public function heroes()
     {
-        $heroes = HomePageHero::all()->map(function($hero) {
-            return [
-                'tag' => $hero->tag,
-                'title' => $hero->title,
-                'highlighted_title' => $hero->highlighted_title,
-                'description' => $hero->description,
-                'background_image' => $this->getFullUrl($hero->background_image),
-                'btn1_text' => $hero->btn1_text,
-                'btn1_url' => $hero->btn1_url,
-                'btn2_text' => $hero->btn2_text,
-                'btn2_url' => $hero->btn2_url,
-            ];
-        });
-        return response()->json($heroes);
+        $hero = HomePageHero::first();
+        if (!$hero) return response()->json(null);
+
+        return response()->json([
+            'tag' => $hero->tag,
+            'tag_size' => str_replace('px', '', $hero->tag_size),
+            'title' => $hero->title,
+            'title_size' => str_replace('px', '', $hero->title_size),
+            'highlighted_title' => $hero->highlighted_title,
+            'highlight_size' => str_replace('px', '', $hero->highlight_size),
+            'description' => $hero->description,
+            'description_size' => str_replace('px', '', $hero->description_size),
+            'background_image' => $this->getFullUrl($hero->background_image),
+            'background_images' => array_map(function($path) {
+                return $this->getFullUrl($path);
+            }, $hero->background_images ?? []),
+            'btn1_text' => $hero->btn1_text,
+            'btn1_url' => $hero->btn1_url,
+            'btn1_icon' => $this->getFullUrl($hero->btn1_icon),
+            'btn2_text' => $hero->btn2_text,
+            'btn2_url' => $hero->btn2_url,
+            'btn2_icon' => $this->getFullUrl($hero->btn2_icon),
+        ]);
     }
 
     public function partners()
@@ -168,6 +177,14 @@ class ApiController extends Controller
         
         $destinations = $query->latest()->get()->map(function($dest) {
             $dest->image = $this->getFullUrl($dest->image);
+            if (is_array($dest->attractions)) {
+                $dest->attractions = array_map(function($attr) {
+                    if (is_array($attr) && isset($attr['image'])) {
+                        $attr['image'] = $this->getFullUrl($attr['image']);
+                    }
+                    return $attr;
+                }, $dest->attractions);
+            }
             return $dest;
         });
         return response()->json($destinations);
@@ -177,6 +194,14 @@ class ApiController extends Controller
     {
         $dest = Destination::with('province')->findOrFail($id);
         $dest->image = $this->getFullUrl($dest->image);
+        if (is_array($dest->attractions)) {
+            $dest->attractions = array_map(function($attr) {
+                if (is_array($attr) && isset($attr['image'])) {
+                    $attr['image'] = $this->getFullUrl($attr['image']);
+                }
+                return $attr;
+            }, $dest->attractions);
+        }
         return response()->json($dest);
     }
 
@@ -233,5 +258,15 @@ class ApiController extends Controller
             ];
         });
         return response()->json($trans);
+    }
+
+    public function transportationPage()
+    {
+        $page = \App\Models\TransportationPage::first();
+        if ($page) {
+            $page->image_01 = $this->getFullUrl($page->image_01);
+            $page->image_02 = $this->getFullUrl($page->image_02);
+        }
+        return response()->json($page);
     }
 }
