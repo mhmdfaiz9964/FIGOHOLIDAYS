@@ -21,11 +21,11 @@ class OfferController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhereHas('category', function($cq) use ($search) {
-                      $cq->where('name', 'like', "%{$search}%");
-                  });
+                    ->orWhereHas('category', function ($cq) use ($search) {
+                        $cq->where('name', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -67,6 +67,10 @@ class OfferController extends Controller
             'itineraries' => 'required|array|min:1',
             'itineraries.*.day' => 'required|string',
             'itineraries.*.title' => 'required|string',
+            'inclusions' => 'nullable|array',
+            'exclusions' => 'nullable|array',
+            'cancellation_policy' => 'nullable|string',
+            'more_details' => 'nullable|string',
         ]);
 
         try {
@@ -119,8 +123,9 @@ class OfferController extends Controller
                 if (isset($item['activities'])) {
                     $activities = [];
                     foreach ($item['activities'] as $actIndex => $act) {
-                        if (empty($act['text'])) continue;
-                        
+                        if (empty($act['text']))
+                            continue;
+
                         $actItem = ['text' => $act['text']];
                         if (isset($request->file('itineraries')[$index]['activities'][$actIndex]['icon'])) {
                             $actItem['icon'] = $request->file('itineraries')[$index]['activities'][$actIndex]['icon']->store('offers/icons', 'public');
@@ -172,6 +177,10 @@ class OfferController extends Controller
             'star_rating' => 'required|integer|between:1,5',
             'types' => 'required|array',
             'itineraries' => 'required|array|min:1',
+            'inclusions' => 'nullable|array',
+            'exclusions' => 'nullable|array',
+            'cancellation_policy' => 'nullable|string',
+            'more_details' => 'nullable|string',
         ]);
 
         try {
@@ -182,17 +191,20 @@ class OfferController extends Controller
 
             // Handle Media Updates
             if ($request->hasFile('thumbnail_image')) {
-                if ($offer->thumbnail_image) Storage::disk('public')->delete($offer->thumbnail_image);
+                if ($offer->thumbnail_image)
+                    Storage::disk('public')->delete($offer->thumbnail_image);
                 $data['thumbnail_image'] = $request->file('thumbnail_image')->store('offers/thumbnails', 'public');
             }
 
             if ($request->hasFile('video')) {
-                if ($offer->video) Storage::disk('public')->delete($offer->video);
+                if ($offer->video)
+                    Storage::disk('public')->delete($offer->video);
                 $data['video'] = $request->file('video')->store('offers/videos', 'public');
             }
 
             if ($request->hasFile('sidebar_banner_image')) {
-                if ($offer->sidebar_banner_image) Storage::disk('public')->delete($offer->sidebar_banner_image);
+                if ($offer->sidebar_banner_image)
+                    Storage::disk('public')->delete($offer->sidebar_banner_image);
                 $data['sidebar_banner_image'] = $request->file('sidebar_banner_image')->store('offers/banners', 'public');
             }
 
@@ -200,7 +212,8 @@ class OfferController extends Controller
                 // For gallery, we usually keep old ones or replace all. 
                 // Here we replace all for simplicity, or you can add logic to keep specific ones.
                 if ($offer->gallery_images) {
-                    foreach ($offer->gallery_images as $oldImg) Storage::disk('public')->delete($oldImg);
+                    foreach ($offer->gallery_images as $oldImg)
+                        Storage::disk('public')->delete($oldImg);
                 }
                 $gallery = [];
                 foreach ($request->file('gallery_images') as $file) {
@@ -212,16 +225,8 @@ class OfferController extends Controller
             $offer->update($data);
             $offer->types()->sync($request->types);
 
-            // Itineraries Update (Delete old and re-create is safest for complex dynamic forms)
-            foreach ($offer->itineraries as $it) {
-                if ($it->images) foreach ($it->images as $img) Storage::disk('public')->delete($img);
-                if ($it->activities) {
-                    foreach ($it->activities as $act) {
-                        if (isset($act['icon'])) Storage::disk('public')->delete($act['icon']);
-                    }
-                }
-                $it->delete();
-            }
+            $oldItineraries = $offer->itineraries->keyBy('id');
+            $offer->itineraries()->delete(); // Clear relations, logic below handles re-creation/preservation
 
             foreach ($request->itineraries as $index => $item) {
                 $itineraryData = [
@@ -230,22 +235,42 @@ class OfferController extends Controller
                     'description' => $item['description'] ?? null,
                 ];
 
+                $existingIt = isset($item['id']) ? $oldItineraries->get($item['id']) : null;
+
+                // Handle Images: Preservation logic
                 if (isset($request->file('itineraries')[$index]['images'])) {
                     $itImages = [];
                     foreach ($request->file('itineraries')[$index]['images'] as $file) {
                         $itImages[] = $file->store('offers/itinerary', 'public');
                     }
                     $itineraryData['images'] = $itImages;
+                    // Delete old images if replacing
+                    if ($existingIt && $existingIt->images) {
+                        foreach ($existingIt->images as $oldImg)
+                            Storage::disk('public')->delete($oldImg);
+                    }
+                } elseif ($existingIt) {
+                    $itineraryData['images'] = $existingIt->images;
                 }
 
+                // Handle Activities
                 if (isset($item['activities'])) {
                     $activities = [];
                     foreach ($item['activities'] as $actIndex => $act) {
-                        if (empty($act['text'])) continue;
+                        if (empty($act['text']))
+                            continue;
                         $actItem = ['text' => $act['text']];
+
+                        // Check if new icon uploaded
                         if (isset($request->file('itineraries')[$index]['activities'][$actIndex]['icon'])) {
                             $actItem['icon'] = $request->file('itineraries')[$index]['activities'][$actIndex]['icon']->store('offers/icons', 'public');
+                            // Delete old icon if exists
+                            if (isset($act['old_icon']))
+                                Storage::disk('public')->delete($act['old_icon']);
+                        } elseif (isset($act['icon'])) {
+                            $actItem['icon'] = $act['icon'];
                         }
+
                         $activities[] = $actItem;
                     }
                     $itineraryData['activities'] = $activities;
@@ -269,34 +294,71 @@ class OfferController extends Controller
     {
         try {
             DB::beginTransaction();
-            
+
             // Clean up main media
-            if ($offer->thumbnail_image) Storage::disk('public')->delete($offer->thumbnail_image);
-            if ($offer->video) Storage::disk('public')->delete($offer->video);
-            if ($offer->sidebar_banner_image) Storage::disk('public')->delete($offer->sidebar_banner_image);
+            if ($offer->thumbnail_image)
+                Storage::disk('public')->delete($offer->thumbnail_image);
+            if ($offer->video)
+                Storage::disk('public')->delete($offer->video);
+            if ($offer->sidebar_banner_image)
+                Storage::disk('public')->delete($offer->sidebar_banner_image);
             if ($offer->gallery_images) {
-                foreach ($offer->gallery_images as $img) Storage::disk('public')->delete($img);
+                foreach ($offer->gallery_images as $img)
+                    Storage::disk('public')->delete($img);
             }
 
             // Clean up itineraries
             foreach ($offer->itineraries as $it) {
                 if ($it->images) {
-                    foreach ($it->images as $img) Storage::disk('public')->delete($img);
+                    foreach ($it->images as $img)
+                        Storage::disk('public')->delete($img);
                 }
                 if ($it->activities) {
                     foreach ($it->activities as $act) {
-                        if (isset($act['icon'])) Storage::disk('public')->delete($act['icon']);
+                        if (isset($act['icon']))
+                            Storage::disk('public')->delete($act['icon']);
                     }
                 }
             }
 
             $offer->delete(); // Cascades to itineraries if FK set correctly, but manual cleanup is done.
-            
+
             DB::commit();
             return redirect()->route('offers.index')->with('success', 'Offer and all associated media deleted.');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Deletetion failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Duplicate the specified resource.
+     */
+    public function duplicate(Offer $offer)
+    {
+        try {
+            DB::beginTransaction();
+
+            $newOffer = $offer->replicate();
+            $newOffer->title = $offer->title . ' (Copy)';
+            $newOffer->status = 'inactive'; // Default to inactive for copies
+            $newOffer->save();
+
+            // Sync types
+            $newOffer->types()->sync($offer->types->pluck('id'));
+
+            // Replicate itineraries
+            foreach ($offer->itineraries as $itinerary) {
+                $newItinerary = $itinerary->replicate();
+                $newItinerary->offer_id = $newOffer->id;
+                $newItinerary->save();
+            }
+
+            DB::commit();
+            return redirect()->route('offers.index')->with('success', 'Offer duplicated successfully as draft.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Duplication failed: ' . $e->getMessage());
         }
     }
 }

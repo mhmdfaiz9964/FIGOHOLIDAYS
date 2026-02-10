@@ -15,13 +15,14 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::resource('users', \App\Http\Controllers\UserController::class);
-    
+
     // Main Banner Designer (Single Page with Multi-BG)
     Route::get('heroes', [\App\Http\Controllers\HeroController::class, 'index'])->name('heroes.index');
     Route::post('heroes', [\App\Http\Controllers\HeroController::class, 'store'])->name('heroes.store');
 
     Route::resource('partners', \App\Http\Controllers\PartnerController::class);
     Route::resource('offer-categories', \App\Http\Controllers\OfferCategoryController::class);
+    Route::post('offers/{offer}/duplicate', [\App\Http\Controllers\OfferController::class, 'duplicate'])->name('offers.duplicate');
     Route::resource('offers', \App\Http\Controllers\OfferController::class);
     Route::resource('transportations', \App\Http\Controllers\TransportationController::class);
     Route::get('transportation-page', [\App\Http\Controllers\TransportationPageController::class, 'edit'])->name('transportations.page.edit');
@@ -44,4 +45,4 @@ Route::middleware('auth')->group(function () {
     Route::get('api/offer-types', [\App\Http\Controllers\OfferTypeController::class, 'index'])->name('offer-types.api');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

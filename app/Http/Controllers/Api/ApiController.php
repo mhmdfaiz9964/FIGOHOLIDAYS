@@ -22,8 +22,10 @@ class ApiController extends Controller
 {
     private function getFullUrl($path)
     {
-        if (!$path) return null;
-        if (filter_var($path, FILTER_VALIDATE_URL)) return $path;
+        if (!$path)
+            return null;
+        if (filter_var($path, FILTER_VALIDATE_URL))
+            return $path;
         return url(Storage::url($path));
     }
 
@@ -50,7 +52,8 @@ class ApiController extends Controller
     public function heroes()
     {
         $hero = HomePageHero::first();
-        if (!$hero) return response()->json(null);
+        if (!$hero)
+            return response()->json(null);
 
         return response()->json([
             'tag' => $hero->tag,
@@ -62,7 +65,7 @@ class ApiController extends Controller
             'description' => $hero->description,
             'description_size' => str_replace('px', '', $hero->description_size),
             'background_image' => $this->getFullUrl($hero->background_image),
-            'background_images' => array_map(function($path) {
+            'background_images' => array_map(function ($path) {
                 return $this->getFullUrl($path);
             }, $hero->background_images ?? []),
             'btn1_text' => $hero->btn1_text,
@@ -76,7 +79,7 @@ class ApiController extends Controller
 
     public function partners()
     {
-        $partners = Partner::all()->map(function($partner) {
+        $partners = Partner::all()->map(function ($partner) {
             return [
                 'name' => $partner->name,
                 'image' => $this->getFullUrl($partner->image),
@@ -87,7 +90,7 @@ class ApiController extends Controller
 
     public function categories()
     {
-        $categories = OfferCategory::all()->map(function($cat) {
+        $categories = OfferCategory::all()->map(function ($cat) {
             return [
                 'id' => $cat->id,
                 'title' => $cat->title,
@@ -100,7 +103,7 @@ class ApiController extends Controller
 
     public function offers()
     {
-        $offers = Offer::with(['category', 'types', 'itineraries'])->latest()->get()->map(function($offer) {
+        $offers = Offer::active()->with(['category', 'types', 'itineraries'])->latest()->get()->map(function ($offer) {
             return $this->formatOffer($offer);
         });
         return response()->json($offers);
@@ -116,30 +119,33 @@ class ApiController extends Controller
     {
         $offer->thumbnail_image = $this->getFullUrl($offer->thumbnail_image);
         $offer->sidebar_banner_image = $this->getFullUrl($offer->sidebar_banner_image);
-        
+
         if (is_array($offer->gallery_images)) {
-            $offer->gallery_images = array_map(function($img) {
+            $offer->gallery_images = array_map(function ($img) {
                 return $this->getFullUrl($img);
             }, $offer->gallery_images);
         }
 
+        $offer->inclusions = $offer->inclusions ?: [];
+        $offer->exclusions = $offer->exclusions ?: [];
+
         if ($offer->itineraries) {
-            $offer->itineraries->transform(function($itinerary) {
+            $offer->itineraries->transform(function ($itinerary) {
                 if (is_array($itinerary->images)) {
-                    $itinerary->images = array_map(function($img) {
+                    $itinerary->images = array_map(function ($img) {
                         return $this->getFullUrl($img);
                     }, $itinerary->images);
                 }
                 return $itinerary;
             });
         }
-        
+
         return $offer;
     }
 
     public function hotels()
     {
-        $hotels = Hotel::with('hotelType')->latest()->get()->map(function($hotel) {
+        $hotels = Hotel::with('hotelType')->latest()->get()->map(function ($hotel) {
             return [
                 'id' => $hotel->id,
                 'name' => $hotel->name,
@@ -150,8 +156,8 @@ class ApiController extends Controller
                 'hotel_type' => [
                     'title' => $hotel->hotelType ? $hotel->hotelType->name : 'فنادق 5 نجوم'
                 ],
-                'stars' => (int)$hotel->rating,
-                'pricePerNight' => (float)$hotel->price_per_night,
+                'stars' => (int) $hotel->rating,
+                'pricePerNight' => (float) $hotel->price_per_night,
                 'currency' => '$',
                 'amenities' => $hotel->activities ?: [],
             ];
@@ -169,16 +175,16 @@ class ApiController extends Controller
     public function destinations(Request $request)
     {
         $query = Destination::with('province');
-        
+
         // Filter by province_id if provided
         if ($request->filled('province_id')) {
             $query->where('province_id', $request->province_id);
         }
-        
-        $destinations = $query->latest()->get()->map(function($dest) {
+
+        $destinations = $query->latest()->get()->map(function ($dest) {
             $dest->image = $this->getFullUrl($dest->image);
             if (is_array($dest->attractions)) {
-                $dest->attractions = array_map(function($attr) {
+                $dest->attractions = array_map(function ($attr) {
                     if (is_array($attr) && isset($attr['image'])) {
                         $attr['image'] = $this->getFullUrl($attr['image']);
                     }
@@ -195,7 +201,7 @@ class ApiController extends Controller
         $dest = Destination::with('province')->findOrFail($id);
         $dest->image = $this->getFullUrl($dest->image);
         if (is_array($dest->attractions)) {
-            $dest->attractions = array_map(function($attr) {
+            $dest->attractions = array_map(function ($attr) {
                 if (is_array($attr) && isset($attr['image'])) {
                     $attr['image'] = $this->getFullUrl($attr['image']);
                 }
@@ -208,13 +214,13 @@ class ApiController extends Controller
     public function restaurants(Request $request)
     {
         $query = Restaurant::query();
-        
+
         // Filter by type (cuisine type) if provided
         if ($request->filled('type')) {
             $query->where('type', 'like', '%' . $request->type . '%');
         }
-        
-        $restaurants = $query->latest()->get()->map(function($res) {
+
+        $restaurants = $query->latest()->get()->map(function ($res) {
             $res->image = $this->getFullUrl($res->image);
             return $res;
         });
@@ -223,13 +229,13 @@ class ApiController extends Controller
 
     public function reviews()
     {
-        $reviews = Review::latest()->get()->map(function($rev) {
+        $reviews = Review::latest()->get()->map(function ($rev) {
             return [
                 'id' => $rev->id,
                 'author' => $rev->user_name,
                 'user_image' => $this->getFullUrl($rev->user_image),
                 'location' => $rev->user_location,
-                'rating' => (int)$rev->rating,
+                'rating' => (int) $rev->rating,
                 'comment' => $rev->description,
                 'source' => $rev->source ?: 'TripAdvisor',
                 'date' => $rev->date ? $rev->date->format('F Y') : null,
@@ -245,7 +251,7 @@ class ApiController extends Controller
 
     public function transportations()
     {
-        $trans = Transportation::latest()->get()->map(function($item) {
+        $trans = Transportation::latest()->get()->map(function ($item) {
             return [
                 'id' => $item->id,
                 'name' => $item->title,

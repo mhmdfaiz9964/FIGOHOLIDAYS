@@ -25,10 +25,16 @@ class Offer extends Model
         'sidebar_banner_label',
         'sidebar_banner_description',
         'sidebar_banner_url',
+        'inclusions',
+        'exclusions',
+        'cancellation_policy',
+        'more_details',
     ];
 
     protected $casts = [
         'gallery_images' => 'array',
+        'inclusions' => 'array',
+        'exclusions' => 'array',
         'price' => 'decimal:2',
         'offer_price' => 'decimal:2',
     ];
@@ -51,5 +57,10 @@ class Offer extends Model
     public function itineraries()
     {
         return $this->hasMany(Itinerary::class);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
     }
 }
