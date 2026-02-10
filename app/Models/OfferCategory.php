@@ -34,4 +34,9 @@ class OfferCategory extends Model
     {
         return $query->where('status', 'active');
     }
+
+    public function types()
+    {
+        return $this->belongsToMany(OfferType::class, 'offer_category_offer_type');
+    }
 }

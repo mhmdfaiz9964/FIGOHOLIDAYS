@@ -90,12 +90,19 @@ class ApiController extends Controller
 
     public function categories()
     {
-        $categories = OfferCategory::all()->map(function ($cat) {
+        $categories = OfferCategory::with('types')->get()->map(function ($cat) {
             return [
                 'id' => $cat->id,
                 'title' => $cat->title,
                 'description' => $cat->sub_heading,
                 'image' => $this->getFullUrl($cat->banner_image),
+                'types' => $cat->types->map(function ($type) {
+                    return [
+                        'id' => $type->id,
+                        'name' => $type->name,
+                        'slug' => $type->slug,
+                    ];
+                }),
             ];
         });
         return response()->json($categories);

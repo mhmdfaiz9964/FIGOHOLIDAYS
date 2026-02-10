@@ -18,9 +18,9 @@ class OfferCategoryController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('title', 'like', "%{$search}%");
+                    ->orWhere('title', 'like', "%{$search}%");
             });
         }
 
@@ -33,7 +33,8 @@ class OfferCategoryController extends Controller
      */
     public function create()
     {
-        return view('offer-categories.create');
+        $types = \App\Models\OfferType::all();
+        return view('offer-categories.create', compact('types'));
     }
 
     /**
@@ -57,7 +58,11 @@ class OfferCategoryController extends Controller
             $data['banner_image'] = $request->file('banner_image')->store('categories', 'public');
         }
 
-        OfferCategory::create($data);
+        $category = OfferCategory::create($data);
+
+        if ($request->has('types')) {
+            $category->types()->sync($request->types);
+        }
 
         return redirect()->route('offer-categories.index')->with('success', 'Category created successfully.');
     }
@@ -67,7 +72,11 @@ class OfferCategoryController extends Controller
      */
     public function edit(OfferCategory $offerCategory)
     {
-        return view('offer-categories.edit', ['category' => $offerCategory]);
+        $types = \App\Models\OfferType::all();
+        return view('offer-categories.edit', [
+            'category' => $offerCategory,
+            'types' => $types
+        ]);
     }
 
     /**
@@ -96,6 +105,12 @@ class OfferCategoryController extends Controller
 
         $offerCategory->update($data);
 
+        if ($request->has('types')) {
+            $offerCategory->types()->sync($request->types);
+        } else {
+            $offerCategory->types()->detach();
+        }
+
         return redirect()->route('offer-categories.index')->with('success', 'Category updated successfully.');
     }
 
@@ -107,7 +122,7 @@ class OfferCategoryController extends Controller
         if ($offerCategory->banner_image) {
             Storage::disk('public')->delete($offerCategory->banner_image);
         }
-        
+
         $offerCategory->delete();
 
         return redirect()->route('offer-categories.index')->with('success', 'Category deleted successfully.');

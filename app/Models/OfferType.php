@@ -21,4 +21,9 @@ class OfferType extends Model
     {
         return $this->belongsToMany(Offer::class);
     }
+
+    public function categories()
+    {
+        return $this->belongsToMany(OfferCategory::class, 'offer_category_offer_type');
+    }
 }
