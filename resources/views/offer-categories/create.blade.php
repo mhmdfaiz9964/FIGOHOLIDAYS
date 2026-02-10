@@ -131,7 +131,7 @@
                                     class="text-xs font-black text-slate-400 uppercase tracking-widest px-1">Associated
                                     Types</label>
                                 <button type="button" @click="showTypeModal = true"
-                                    class="text-[#0F4A3B] hover:opacity-70 transition-all">
+                                    class="p-2 bg-slate-50 rounded-lg text-[#0F4A3B] hover:bg-slate-100 transition-all flex items-center justify-center">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M12 4v16m8-8H4" />
@@ -248,35 +248,34 @@
         </div>
 
         <!-- Create Type Modal -->
-        <template x-if="showTypeModal">
-            <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-                <div @click.away="showTypeModal = false"
-                    class="bg-white rounded-[2rem] shadow-2xl w-full max-w-md p-10 space-y-8 animate-in zoom-in duration-300">
-                    <div>
-                        <h3 class="text-2xl font-black text-slate-900">Add New Type</h3>
-                        <p class="text-slate-400 font-semibold mt-1">Create a new offer type to associate with this
-                            category.</p>
-                    </div>
+        <div x-show="showTypeModal" x-cloak
+            class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+            <div @click.away="showTypeModal = false"
+                class="bg-white rounded-[2rem] shadow-2xl w-full max-w-md p-10 space-y-8 animate-in zoom-in duration-300">
+                <div>
+                    <h3 class="text-2xl font-black text-slate-900">Add New Type</h3>
+                    <p class="text-slate-400 font-semibold mt-1">Create a new offer type to associate with this
+                        category.</p>
+                </div>
 
-                    <div class="space-y-6">
-                        <div class="space-y-2">
-                            <label class="text-xs font-black text-slate-400 uppercase tracking-widest px-1">Type
-                                Name</label>
-                            <input type="text" x-model="newTypeName" @keydown.enter="createType"
-                                class="w-full px-6 py-4 bg-slate-50 border-transparent rounded-2xl font-bold text-slate-900 focus:bg-white focus:border-[#0F4A3B]/20 transition-all outline-none"
-                                placeholder="e.g. Adventure">
-                        </div>
-                    </div>
-
-                    <div class="flex gap-4">
-                        <button type="button" @click="showTypeModal = false"
-                            class="flex-1 py-4 bg-slate-50 text-slate-400 rounded-2xl font-bold hover:bg-slate-100 transition-all">Cancel</button>
-                        <button type="button" @click="createType"
-                            class="flex-1 py-4 bg-[#0F4A3B] text-white rounded-2xl font-black shadow-lg shadow-[#0F4A3B]/20 hover:opacity-95 transition-all">Create
-                            Type</button>
+                <div class="space-y-6">
+                    <div class="space-y-2">
+                        <label class="text-xs font-black text-slate-400 uppercase tracking-widest px-1">Type
+                            Name</label>
+                        <input type="text" x-model="newTypeName" @keydown.enter="createType"
+                            class="w-full px-6 py-4 bg-slate-50 border-transparent rounded-2xl font-bold text-slate-900 focus:bg-white focus:border-[#0F4A3B]/20 transition-all outline-none"
+                            placeholder="e.g. Adventure">
                     </div>
                 </div>
+
+                <div class="flex gap-4">
+                    <button type="button" @click="showTypeModal = false"
+                        class="flex-1 py-4 bg-slate-50 text-slate-400 rounded-2xl font-bold hover:bg-slate-100 transition-all">Cancel</button>
+                    <button type="button" @click="createType"
+                        class="flex-1 py-4 bg-[#0F4A3B] text-white rounded-2xl font-black shadow-lg shadow-[#0F4A3B]/20 hover:opacity-95 transition-all">Create
+                        Type</button>
+                </div>
             </div>
-        </template>
+        </div>
     </div>
 </x-app-layout>
