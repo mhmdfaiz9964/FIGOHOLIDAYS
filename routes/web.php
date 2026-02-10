@@ -21,6 +21,7 @@ Route::middleware('auth')->group(function () {
     Route::post('heroes', [\App\Http\Controllers\HeroController::class, 'store'])->name('heroes.store');
 
     Route::resource('partners', \App\Http\Controllers\PartnerController::class);
+    Route::get('offer-categories/check-uniqueness', [\App\Http\Controllers\OfferCategoryController::class, 'checkUniqueness'])->name('offer-categories.check-uniqueness');
     Route::resource('offer-categories', \App\Http\Controllers\OfferCategoryController::class);
     Route::post('offers/{offer}/duplicate', [\App\Http\Controllers\OfferController::class, 'duplicate'])->name('offers.duplicate');
     Route::resource('offers', \App\Http\Controllers\OfferController::class);

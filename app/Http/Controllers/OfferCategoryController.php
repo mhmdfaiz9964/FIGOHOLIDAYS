@@ -127,4 +127,21 @@ class OfferCategoryController extends Controller
 
         return redirect()->route('offer-categories.index')->with('success', 'Category deleted successfully.');
     }
+    /**
+     * Check if name or slug is unique (AJAX).
+     */
+    public function checkUniqueness(Request $request)
+    {
+        $field = $request->field;
+        $value = $field === 'slug' ? Str::slug($request->value) : $request->value;
+        $id = $request->id;
+
+        $exists = OfferCategory::where($field, $value)
+            ->when($id, function ($q) use ($id) {
+                return $q->where('id', '!=', $id);
+            })
+            ->exists();
+
+        return response()->json(['unique' => !$exists]);
+    }
 }
