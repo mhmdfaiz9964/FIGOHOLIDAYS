@@ -49,25 +49,24 @@
                     const label = document.createElement('label');
                     label.className = 'relative cursor-pointer group';
                     label.innerHTML = `
-                        <input type=" checkbox" name="types[]" value='${newId}' class="peer hidden" checked>
-        <div
-            class="px-4 py-3 bg-slate-50 border-2 border-transparent rounded-2xl text-center transition-all peer-checked:bg-[#0F4A3B]/5 peer-checked:border-[#0F4A3B]/20 peer-checked:text-[#0F4A3B] group-hover:bg-slate-100">
-            <span class="text-[10px] font-black uppercase tracking-widest">${newName}</span>
-        </div>
-        `;
-        container.appendChild(label);
-
-        this.showTypeModal = false;
-        this.newTypeName = '';
-        } else {
-        alert(result.message || 'Error creating type');
+                        <input type='checkbox' name='types[]' value='${newId}' class='peer hidden' checked>
+                        <div class='px-4 py-3 bg-slate-50 border-2 border-transparent rounded-2xl text-center transition-all peer-checked:bg-[#0F4A3B]/5 peer-checked:border-[#0F4A3B]/20 peer-checked:text-[#0F4A3B] group-hover:bg-slate-100'>
+                            <span class='text-[10px] font-black uppercase tracking-widest'>${newName}</span>
+                        </div>
+                    `;
+                    container.appendChild(label);
+                    
+                    this.showTypeModal = false;
+                    this.newTypeName = '';
+                } else {
+                    alert(result.message || 'Error creating type');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while creating the type');
+            }
         }
-        } catch (error) {
-        console.error('Error:', error);
-        alert('An error occurred while creating the type');
-        }
-        }
-        }" class="space-y-10 animate-in fade-in duration-700 pb-20">
+    }" class="space-y-10 animate-in fade-in duration-700 pb-20">
 
         <!-- Header -->
         <div class="flex items-center gap-6">
@@ -98,7 +97,8 @@
                                 :class="{'border-rose-500 focus:border-rose-500 focus:ring-rose-500/5': !isNameUnique}"
                                 class="w-full px-6 py-4 bg-slate-50 border-transparent rounded-2xl font-bold text-slate-900 focus:bg-white focus:border-[#0F4A3B]/20 focus:ring-4 focus:ring-[#0F4A3B]/5 transition-all outline-none"
                                 placeholder="e.g. Honeymoon Special">
-                            <p x-show="!isNameUnique" class="text-rose-500 text-[10px] font-black uppercase tracking-widest mt-1 px-1">
+                            <p x-show="!isNameUnique"
+                                class="text-rose-500 text-[10px] font-black uppercase tracking-widest mt-1 px-1">
                                 This name is already taken
                             </p>
                             @error('name') <p
@@ -115,7 +115,8 @@
                                 :class="{'border-rose-500 focus:border-rose-500 focus:ring-rose-500/5': !isSlugUnique}"
                                 class="w-full px-6 py-4 bg-slate-50 border-transparent rounded-2xl font-bold text-slate-500 text-sm focus:bg-white focus:border-[#0F4A3B]/20 focus:ring-4 focus:ring-[#0F4A3B]/5 transition-all outline-none"
                                 placeholder="honeymoon-special">
-                            <p x-show="!isSlugUnique" class="text-rose-500 text-[10px] font-black uppercase tracking-widest mt-1 px-1">
+                            <p x-show="!isSlugUnique"
+                                class="text-rose-500 text-[10px] font-black uppercase tracking-widest mt-1 px-1">
                                 This slug is already taken
                             </p>
                             @error('slug') <p
