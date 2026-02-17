@@ -5,6 +5,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
+        @php 
+            $siteSettings = \App\Models\GeneralSetting::first();
+            $primaryColor = $siteSettings->primary_color ?? '#0F4A3B';
+        @endphp
+
         <title>{{ config('app.name', 'FIGO HOLIDAYS') }}</title>
         @if($siteSettings && $siteSettings->favicon)
             <link rel="icon" type="image/x-icon" href="{{ Storage::url($siteSettings->favicon) }}">
@@ -19,10 +24,6 @@
 
         <!-- Scripts -->
         <script src="https://cdn.tailwindcss.com"></script>
-        @php 
-            $siteSettings = \App\Models\GeneralSetting::first();
-            $primaryColor = $siteSettings->primary_color ?? '#0F4A3B';
-        @endphp
         <script>
             tailwind.config = {
                 theme: {
