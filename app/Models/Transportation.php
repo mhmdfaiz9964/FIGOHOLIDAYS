@@ -12,6 +12,8 @@ class Transportation extends Model
         'vehicle_image',
         'includes',
         'starting_price',
+        'seats',
+        'bags',
         'label_icon',
         'status',
     ];

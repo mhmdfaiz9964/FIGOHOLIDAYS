@@ -35,6 +35,7 @@ class ApiController extends Controller
         if ($settings) {
             $settings->logo = $this->getFullUrl($settings->logo);
             $settings->footer_logo = $this->getFullUrl($settings->footer_logo);
+            $settings->favicon = $this->getFullUrl($settings->favicon);
         }
         return response()->json($settings);
     }
@@ -265,8 +266,8 @@ class ApiController extends Controller
                 'type' => $item->vehicle_type,
                 'image' => $this->getFullUrl($item->vehicle_image),
                 'pricePerDay' => $item->starting_price,
-                'seats' => $item->seats ?? 4, // Default if not in DB
-                'bags' => $item->bags ?? 2,   // Default if not in DB
+                'seats' => $item->seats,
+                'bags' => $item->bags,
                 'includes' => $item->includes,
             ];
         });

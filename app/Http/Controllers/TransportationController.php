@@ -14,7 +14,7 @@ class TransportationController extends Controller
         $query = Transportation::query();
         if ($request->filled('search')) {
             $query->where('title', 'like', '%' . $request->search . '%')
-                  ->orWhere('vehicle_type', 'like', '%' . $request->search . '%');
+                ->orWhere('vehicle_type', 'like', '%' . $request->search . '%');
         }
         $transportations = $query->latest()->paginate(10);
         return view('transportations.index', compact('transportations'));
@@ -33,6 +33,8 @@ class TransportationController extends Controller
             'vehicle_image' => 'nullable|image|max:5120',
             'label_icon' => 'nullable|image|max:2048',
             'starting_price' => 'required|numeric|min:0',
+            'seats' => 'required|integer|min:1',
+            'bags' => 'required|integer|min:0',
             'status' => 'required|in:active,inactive',
             'includes' => 'nullable|array',
         ]);
@@ -41,7 +43,7 @@ class TransportationController extends Controller
             DB::beginTransaction();
 
             $data = $request->except(['vehicle_image', 'label_icon', 'includes']);
-            
+
             if ($request->hasFile('vehicle_image')) {
                 $data['vehicle_image'] = $request->file('vehicle_image')->store('transportation/vehicles', 'public');
             }
@@ -54,14 +56,15 @@ class TransportationController extends Controller
             if ($request->has('includes')) {
                 $includes = [];
                 foreach ($request->input('includes') as $index => $item) {
-                    if (empty($item['title'])) continue;
-                    
+                    if (empty($item['title']))
+                        continue;
+
                     $includeItem = ['title' => $item['title']];
-                    
+
                     if (isset($request->file('includes')[$index]['icon'])) {
                         $includeItem['icon'] = $request->file('includes')[$index]['icon']->store('transportation/includes', 'public');
                     }
-                    
+
                     $includes[] = $includeItem;
                 }
                 $data['includes'] = $includes;
@@ -90,6 +93,8 @@ class TransportationController extends Controller
             'vehicle_image' => 'nullable|image|max:5120',
             'label_icon' => 'nullable|image|max:2048',
             'starting_price' => 'required|numeric|min:0',
+            'seats' => 'required|integer|min:1',
+            'bags' => 'required|integer|min:0',
             'status' => 'required|in:active,inactive',
         ]);
 
@@ -99,12 +104,14 @@ class TransportationController extends Controller
             $data = $request->except(['vehicle_image', 'label_icon', 'includes', '_method', '_token']);
 
             if ($request->hasFile('vehicle_image')) {
-                if ($transportation->vehicle_image) Storage::disk('public')->delete($transportation->vehicle_image);
+                if ($transportation->vehicle_image)
+                    Storage::disk('public')->delete($transportation->vehicle_image);
                 $data['vehicle_image'] = $request->file('vehicle_image')->store('transportation/vehicles', 'public');
             }
 
             if ($request->hasFile('label_icon')) {
-                if ($transportation->label_icon) Storage::disk('public')->delete($transportation->label_icon);
+                if ($transportation->label_icon)
+                    Storage::disk('public')->delete($transportation->label_icon);
                 $data['label_icon'] = $request->file('label_icon')->store('transportation/icons', 'public');
             }
 
@@ -112,16 +119,17 @@ class TransportationController extends Controller
             if ($request->has('includes')) {
                 $includes = [];
                 $oldIncludes = $transportation->includes ?? [];
-                
+
                 foreach ($request->input('includes') as $index => $item) {
-                    if (empty($item['title'])) continue;
+                    if (empty($item['title']))
+                        continue;
 
                     $includeItem = ['title' => $item['title']];
-                    
+
                     // If new file uploaded
                     if (isset($request->file('includes')[$index]['icon'])) {
                         $includeItem['icon'] = $request->file('includes')[$index]['icon']->store('transportation/includes', 'public');
-                    } 
+                    }
                     // Keep old icon if it exists and no new file
                     elseif (isset($item['old_icon'])) {
                         $includeItem['icon'] = $item['old_icon'];
@@ -130,14 +138,16 @@ class TransportationController extends Controller
                     $includes[] = $includeItem;
                 }
                 $data['includes'] = $includes;
-                
+
                 // Cleanup old images that aren't in the new list
-                foreach($oldIncludes as $old) {
+                foreach ($oldIncludes as $old) {
                     $stillExists = false;
-                    foreach($includes as $curr) {
-                        if(isset($curr['icon']) && $curr['icon'] == $old['icon']) $stillExists = true;
+                    foreach ($includes as $curr) {
+                        if (isset($curr['icon']) && $curr['icon'] == $old['icon'])
+                            $stillExists = true;
                     }
-                    if(!$stillExists && isset($old['icon'])) Storage::disk('public')->delete($old['icon']);
+                    if (!$stillExists && isset($old['icon']))
+                        Storage::disk('public')->delete($old['icon']);
                 }
             }
 
@@ -153,11 +163,14 @@ class TransportationController extends Controller
 
     public function destroy(Transportation $transportation)
     {
-        if ($transportation->vehicle_image) Storage::disk('public')->delete($transportation->vehicle_image);
-        if ($transportation->label_icon) Storage::disk('public')->delete($transportation->label_icon);
+        if ($transportation->vehicle_image)
+            Storage::disk('public')->delete($transportation->vehicle_image);
+        if ($transportation->label_icon)
+            Storage::disk('public')->delete($transportation->label_icon);
         if ($transportation->includes) {
             foreach ($transportation->includes as $inc) {
-                if (isset($inc['icon'])) Storage::disk('public')->delete($inc['icon']);
+                if (isset($inc['icon']))
+                    Storage::disk('public')->delete($inc['icon']);
             }
         }
         $transportation->delete();

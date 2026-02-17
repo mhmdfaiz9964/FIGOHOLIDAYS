@@ -21,6 +21,7 @@ class GeneralSettingController extends Controller
         $request->validate([
             'logo' => 'nullable|image|max:2048',
             'footer_logo' => 'nullable|image|max:2048',
+            'favicon' => 'nullable|image|max:1024',
             'emails' => 'nullable|array',
             'whatsapps' => 'nullable|array',
             'landlines' => 'nullable|array',
@@ -33,7 +34,7 @@ class GeneralSettingController extends Controller
             'primary_color' => 'nullable|string|max:7',
         ]);
 
-        $data = $request->except(['logo', 'footer_logo']);
+        $data = $request->except(['logo', 'footer_logo', 'favicon']);
 
         // Filter out empty values from arrays
         $data['emails'] = array_values(array_filter($request->input('emails', [])));
@@ -43,13 +44,21 @@ class GeneralSettingController extends Controller
         $data['map_urls'] = array_values(array_filter($request->input('map_urls', [])));
 
         if ($request->hasFile('logo')) {
-            if ($settings->logo) Storage::disk('public')->delete($settings->logo);
+            if ($settings->logo)
+                Storage::disk('public')->delete($settings->logo);
             $data['logo'] = $request->file('logo')->store('settings', 'public');
         }
 
         if ($request->hasFile('footer_logo')) {
-            if ($settings->footer_logo) Storage::disk('public')->delete($settings->footer_logo);
+            if ($settings->footer_logo)
+                Storage::disk('public')->delete($settings->footer_logo);
             $data['footer_logo'] = $request->file('footer_logo')->store('settings', 'public');
+        }
+
+        if ($request->hasFile('favicon')) {
+            if ($settings->favicon)
+                Storage::disk('public')->delete($settings->favicon);
+            $data['favicon'] = $request->file('favicon')->store('settings', 'public');
         }
 
         if ($settings->exists) {

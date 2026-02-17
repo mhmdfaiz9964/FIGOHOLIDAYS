@@ -6,6 +6,11 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ config('app.name', 'FIGO HOLIDAYS') }}</title>
+        @if($siteSettings && $siteSettings->favicon)
+            <link rel="icon" type="image/x-icon" href="{{ Storage::url($siteSettings->favicon) }}">
+        @else
+            <link rel="icon" type="image/jpeg" href="/favicon.jpg">
+        @endif
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
