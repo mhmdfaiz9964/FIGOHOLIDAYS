@@ -552,8 +552,8 @@
             </div>
 
             <!-- Rating Modal -->
-            <div x-show="showRatingModal" x-transition
-                class="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm">
+            <div x-show="showRatingModal" style="display: none;" x-transition
+                class="fixed inset-0 z-[9999] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm">
                 <div @click.away="showRatingModal = false"
                     class="bg-white w-full max-w-md rounded-[2.5rem] p-10 shadow-2xl">
                     <h3 class="text-2xl font-black text-slate-900">Create New Rating</h3>

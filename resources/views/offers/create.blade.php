@@ -567,169 +567,169 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Rating Modal -->
-            <!-- Rating Modal -->
-            <div x-show="showRatingModal" x-transition
-                class="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm">
-                <div @click.away="showRatingModal = false"
-                    class="bg-white w-full max-w-md rounded-[2.5rem] p-10 shadow-2xl">
-                    <h3 class="text-2xl font-black text-slate-900">Create New Rating</h3>
-                    <p class="text-slate-400 text-sm font-bold mt-2">Example: 5 Stars, Excellent, etc.</p>
-                    <div class="mt-8 space-y-6">
-                        <div class="space-y-2">
-                            <label class="text-[10px] font-black text-slate-400 uppercase">Label Name</label>
-                            <input type="text" x-model="newRatingName" placeholder="e.g. Excellent"
-                                class="w-full px-6 py-4 bg-slate-50 border-transparent rounded-2xl font-bold text-slate-900 outline-none focus:bg-white focus:border-[#0F4A3B]/20 transition-all">
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-[10px] font-black text-slate-400 uppercase">Score Value
-                                (Optional)</label>
-                            <input type="text" x-model="newRatingValue" placeholder="e.g. 5.0"
-                                class="w-full px-6 py-4 bg-slate-50 border-transparent rounded-2xl font-bold text-slate-900 outline-none focus:bg-white focus:border-[#0F4A3B]/20 transition-all">
-                        </div>
-                        <div class="flex flex-col gap-3">
-                            <button type="button" @click="saveNewRating()" :disabled="!newRatingName"
-                                class="w-full py-4 bg-[#0F4A3B] text-white rounded-2xl font-black shadow-lg disabled:opacity-50 transition-all">Create
-                                Now</button>
-                            <button type="button" @click="showRatingModal = false"
-                                class="w-full py-4 bg-slate-50 text-slate-400 rounded-2xl font-bold">Cancel</button>
-                        </div>
+        <!-- Rating Modal -->
+        <div x-show="showRatingModal" style="display: none;" x-transition
+            class="fixed inset-0 z-[9999] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm">
+            <div @click.away="showRatingModal = false"
+                class="bg-white w-full max-w-md rounded-[2.5rem] p-10 shadow-2xl">
+                <h3 class="text-2xl font-black text-slate-900">Create New Rating</h3>
+                <p class="text-slate-400 text-sm font-bold mt-2">Example: 5 Stars, Excellent, etc.</p>
+                <div class="mt-8 space-y-6">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-slate-400 uppercase">Label Name</label>
+                        <input type="text" x-model="newRatingName" placeholder="e.g. Excellent"
+                            class="w-full px-6 py-4 bg-slate-50 border-transparent rounded-2xl font-bold text-slate-900 outline-none focus:bg-white focus:border-[#0F4A3B]/20 transition-all">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-slate-400 uppercase">Score Value
+                            (Optional)</label>
+                        <input type="text" x-model="newRatingValue" placeholder="e.g. 5.0"
+                            class="w-full px-6 py-4 bg-slate-50 border-transparent rounded-2xl font-bold text-slate-900 outline-none focus:bg-white focus:border-[#0F4A3B]/20 transition-all">
+                    </div>
+                    <div class="flex flex-col gap-3">
+                        <button type="button" @click="saveNewRating()" :disabled="!newRatingName"
+                            class="w-full py-4 bg-[#0F4A3B] text-white rounded-2xl font-black shadow-lg disabled:opacity-50 transition-all">Create
+                            Now</button>
+                        <button type="button" @click="showRatingModal = false"
+                            class="w-full py-4 bg-slate-50 text-slate-400 rounded-2xl font-bold">Cancel</button>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <script>
-            function offerManager() {
-                return {
-                    showTypeModal: false,
-                    showRatingModal: false,
-                    isUploading: false,
-                    newTypeName: '',
-                    newRatingName: '',
-                    newRatingValue: '',
-                    allTypes: {!! $types->toJson() !!},
-                    allRatings: {!! $ratings->toJson() !!},
-                    inclusions: [''],
-                    exclusions: [''],
-                    previews: {
-                        thumb: null,
-                        video_name: null,
-                        gallery_count: 0
-                    },
-                    itineraries: [
-                        { id: Date.now(), day_label: 'Day 1', activities: [{ id: Date.now() + 1, text: '' }] }
-                    ],
+    <script>
+        function offerManager() {
+            return {
+                showTypeModal: false,
+                showRatingModal: false,
+                isUploading: false,
+                newTypeName: '',
+                newRatingName: '',
+                newRatingValue: '',
+                allTypes: {!! $types->toJson() !!},
+                allRatings: {!! $ratings->toJson() !!},
+                inclusions: [''],
+                exclusions: [''],
+                previews: {
+                    thumb: null,
+                    video_name: null,
+                    gallery_count: 0
+                },
+                itineraries: [
+                    { id: Date.now(), day_label: 'Day 1', activities: [{ id: Date.now() + 1, text: '' }] }
+                ],
 
-                    previewMedia(e, type) {
-                        const files = e.target.files;
-                        if (!files[0]) return;
+                previewMedia(e, type) {
+                    const files = e.target.files;
+                    if (!files[0]) return;
 
-                        if (type === 'thumb') {
-                            this.previews.thumb = URL.createObjectURL(files[0]);
-                        } else if (type === 'video') {
-                            this.previews.video_name = files[0].name;
-                        } else if (type === 'gallery') {
-                            this.previews.gallery_count = files.length;
-                        }
-                    },
-
-                    addDay() {
-                        this.itineraries.push({
-                            id: Date.now(),
-                            day_label: 'Day ' + (this.itineraries.length + 1),
-                            activities: [{ id: Date.now() + 1, text: '' }]
-                        });
-                    },
-
-                    removeDay(index) {
-                        this.itineraries.splice(index, 1);
-                    },
-
-                    addActivity(dayIndex) {
-                        this.itineraries[dayIndex].activities.push({
-                            id: Date.now(),
-                            text: ''
-                        });
-                    },
-
-                    removeActivity(dayIndex, actIndex) {
-                        this.itineraries[dayIndex].activities.splice(actIndex, 1);
-                    },
-
-                    addInclusion() { this.inclusions.push(''); },
-                    removeInclusion(i) { this.inclusions.splice(i, 1); },
-
-                    addExclusion() { this.exclusions.push(''); },
-                    removeExclusion(i) { this.exclusions.splice(i, 1); },
-
-                    saveNewType() {
-                        fetch('{{ route("offer-types.store") }}', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                            },
-                            body: JSON.stringify({ name: this.newTypeName })
-                        })
-                            .then(res => res.json())
-                            .then(data => {
-                                if (data.status === 'success') {
-                                    this.allTypes.push(data.data);
-                                    this.newTypeName = '';
-                                    this.showTypeModal = false;
-
-                                    Swal.fire({
-                                        toast: true, position: 'top-end', showConfirmButton: false, timer: 3000,
-                                        icon: 'success', title: 'Offer type created!'
-                                    });
-                                }
-                            });
-                    },
-
-                    saveNewRating() {
-                        fetch('{{ route("ratings.store") }}', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                            },
-                            body: JSON.stringify({ name: this.newRatingName, value: this.newRatingValue })
-                        })
-                            .then(res => res.json())
-                            .then(data => {
-                                if (data.status === 'success') {
-                                    this.allRatings.push(data.data);
-                                    this.newRatingName = '';
-                                    this.newRatingValue = '';
-                                    this.showRatingModal = false;
-
-                                    Swal.fire({
-                                        toast: true, position: 'top-end', showConfirmButton: false, timer: 3000,
-                                        icon: 'success', title: 'Rating label created!'
-                                    });
-                                }
-                            });
+                    if (type === 'thumb') {
+                        this.previews.thumb = URL.createObjectURL(files[0]);
+                    } else if (type === 'video') {
+                        this.previews.video_name = files[0].name;
+                    } else if (type === 'gallery') {
+                        this.previews.gallery_count = files.length;
                     }
+                },
+
+                addDay() {
+                    this.itineraries.push({
+                        id: Date.now(),
+                        day_label: 'Day ' + (this.itineraries.length + 1),
+                        activities: [{ id: Date.now() + 1, text: '' }]
+                    });
+                },
+
+                removeDay(index) {
+                    this.itineraries.splice(index, 1);
+                },
+
+                addActivity(dayIndex) {
+                    this.itineraries[dayIndex].activities.push({
+                        id: Date.now(),
+                        text: ''
+                    });
+                },
+
+                removeActivity(dayIndex, actIndex) {
+                    this.itineraries[dayIndex].activities.splice(actIndex, 1);
+                },
+
+                addInclusion() { this.inclusions.push(''); },
+                removeInclusion(i) { this.inclusions.splice(i, 1); },
+
+                addExclusion() { this.exclusions.push(''); },
+                removeExclusion(i) { this.exclusions.splice(i, 1); },
+
+                saveNewType() {
+                    fetch('{{ route("offer-types.store") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ name: this.newTypeName })
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                this.allTypes.push(data.data);
+                                this.newTypeName = '';
+                                this.showTypeModal = false;
+
+                                Swal.fire({
+                                    toast: true, position: 'top-end', showConfirmButton: false, timer: 3000,
+                                    icon: 'success', title: 'Offer type created!'
+                                });
+                            }
+                        });
+                },
+
+                saveNewRating() {
+                    fetch('{{ route("ratings.store") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ name: this.newRatingName, value: this.newRatingValue })
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                this.allRatings.push(data.data);
+                                this.newRatingName = '';
+                                this.newRatingValue = '';
+                                this.showRatingModal = false;
+
+                                Swal.fire({
+                                    toast: true, position: 'top-end', showConfirmButton: false, timer: 3000,
+                                    icon: 'success', title: 'Rating label created!'
+                                });
+                            }
+                        });
                 }
             }
+        }
 
-            // Initialize CKEditor
-            window.onload = function () {
-                CKEDITOR.replaceAll('ckeditor');
+        // Initialize CKEditor
+        window.onload = function () {
+            CKEDITOR.replaceAll('ckeditor');
+        }
+    </script>
+
+    <style>
+        @keyframes progress {
+            0% {
+                transform: translateX(-100%);
             }
-        </script>
 
-        <style>
-            @keyframes progress {
-                0% {
-                    transform: translateX(-100%);
-                }
-
-                100% {
-                    transform: translateX(100%);
-                }
+            100% {
+                transform: translateX(100%);
             }
-        </style>
+        }
+    </style>
 </x-app-layout>
