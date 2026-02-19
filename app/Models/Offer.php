@@ -9,6 +9,7 @@ class Offer extends Model
     protected $fillable = [
         'offer_category_id',
         'offer_type_id',
+        'rating_id',
         'title',
         'status',
         'meta_description',
@@ -42,6 +43,11 @@ class Offer extends Model
     public function category()
     {
         return $this->belongsTo(OfferCategory::class, 'offer_category_id');
+    }
+
+    public function rating()
+    {
+        return $this->belongsTo(Rating::class);
     }
 
     public function primaryType()

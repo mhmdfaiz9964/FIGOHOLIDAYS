@@ -124,15 +124,26 @@
                     </div>
 
                     <div class="space-y-2">
-                        <label class="text-xs font-black text-slate-400 uppercase tracking-widest px-1">Star Rating
-                            (1-5)</label>
-                        <select name="star_rating"
+                        <div class="flex items-center justify-between px-1">
+                            <label class="text-xs font-black text-slate-400 uppercase tracking-widest">Rating
+                                Label</label>
+                            <button type="button" @click="showRatingModal = true"
+                                class="text-[#0F4A3B] hover:scale-110 transition-transform">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 4v16m8-8H4" />
+                                </svg>
+                            </button>
+                        </div>
+                        <select name="rating_id"
                             class="w-full px-6 py-4 bg-slate-50 border-transparent rounded-2xl font-bold text-slate-900 focus:bg-white focus:border-[#0F4A3B]/20 outline-none transition-all appearance-none">
-                            @foreach([1, 2, 3, 4, 5] as $star)
-                                <option value="{{ $star }}" {{ $offer->star_rating == $star ? 'selected' : '' }}>{{ $star }}
-                                    Stars</option>
-                            @endforeach
+                            <option value="">Select Rating (Optional)</option>
+                            <template x-for="rating in allRatings" :key="rating.id">
+                                <option :value="rating.id" :selected="rating.id == selectedRatingId"
+                                    x-text="rating.name"></option>
+                            </template>
                         </select>
+                        <input type="hidden" name="star_rating" value="">
                     </div>
                 </div>
 
@@ -538,6 +549,33 @@
                             class="w-full py-4 bg-slate-50 text-slate-400 rounded-2xl font-bold">Cancel</button>
                     </div>
                 </div>
+        </div>
+
+        <!-- Rating Modal -->
+        <div x-show="showRatingModal"
+            class="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm">
+            <div @click.away="showRatingModal = false" class="bg-white w-full max-w-md rounded-[2.5rem] p-10 shadow-2xl">
+                <h3 class="text-2xl font-black text-slate-900">Create New Rating</h3>
+                <p class="text-slate-400 text-sm font-bold mt-2">Example: 5 Stars, Excellent, etc.</p>
+                <div class="mt-8 space-y-6">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-slate-400 uppercase">Label Name</label>
+                        <input type="text" x-model="newRatingName" placeholder="e.g. Excellent"
+                            class="w-full px-6 py-4 bg-slate-50 border-transparent rounded-2xl font-bold text-slate-900 outline-none focus:bg-white focus:border-[#0F4A3B]/20 transition-all">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-slate-400 uppercase">Score Value (Optional)</label>
+                        <input type="text" x-model="newRatingValue" placeholder="e.g. 5.0"
+                            class="w-full px-6 py-4 bg-slate-50 border-transparent rounded-2xl font-bold text-slate-900 outline-none focus:bg-white focus:border-[#0F4A3B]/20 transition-all">
+                    </div>
+                    <div class="flex flex-col gap-3">
+                        <button type="button" @click="saveNewRating()" :disabled="!newRatingName"
+                            class="w-full py-4 bg-[#0F4A3B] text-white rounded-2xl font-black shadow-lg">Save
+                            Rating</button>
+                        <button type="button" @click="showRatingModal = false"
+                            class="w-full py-4 bg-slate-50 text-slate-400 rounded-2xl font-bold">Cancel</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -546,10 +584,15 @@
         function offerManager() {
             return {
                 showTypeModal: false,
+                showRatingModal: false,
                 isUploading: false,
                 newTypeName: '',
+                newRatingName: '',
+                newRatingValue: '',
                 allTypes: {!! $types->toJson() !!},
+                allRatings: {!! $ratings->toJson() !!},
                 selectedTypeIds: {!! $offer->types->pluck('id')->toJson() !!},
+                selectedRatingId: {{ $offer->rating_id ?? 'null' }},
                 inclusions: {!! json_encode($offer->inclusions ?? []) !!},
                 exclusions: {!! json_encode($offer->exclusions ?? []) !!},
                 previews: { thumb: null, video_name: null, gallery_count: 0 },
@@ -607,6 +650,31 @@
                                 this.newTypeName = '';
                                 this.showTypeModal = false;
                                 Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'New type added!', showConfirmButton: false, timer: 2000 });
+                            }
+                        });
+                },
+
+                saveNewRating() {
+                    fetch('{{ route("ratings.store") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ name: this.newRatingName, value: this.newRatingValue })
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                this.allRatings.push(data.data);
+                                this.newRatingName = '';
+                                this.newRatingValue = '';
+                                this.showRatingModal = false;
+
+                                Swal.fire({
+                                    toast: true, position: 'top-end', showConfirmButton: false, timer: 3000,
+                                    icon: 'success', title: 'Rating label created!'
+                                });
                             }
                         });
                 }

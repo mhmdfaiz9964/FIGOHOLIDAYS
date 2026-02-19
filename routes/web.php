@@ -44,6 +44,8 @@ Route::middleware('auth')->group(function () {
     Route::get('api/provinces', [\App\Http\Controllers\ProvinceController::class, 'index'])->name('provinces.api');
     Route::post('offer-types', [\App\Http\Controllers\OfferTypeController::class, 'store'])->name('offer-types.store');
     Route::get('api/offer-types', [\App\Http\Controllers\OfferTypeController::class, 'index'])->name('offer-types.api');
+    Route::post('ratings', [\App\Http\Controllers\RatingController::class, 'store'])->name('ratings.store');
+    Route::get('api/ratings', [\App\Http\Controllers\RatingController::class, 'index'])->name('ratings.api');
 });
 
 require __DIR__ . '/auth.php';

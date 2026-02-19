@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 
+use App\Models\Rating;
+
 class OfferController extends Controller
 {
     /**
@@ -17,7 +19,7 @@ class OfferController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Offer::with(['category', 'types']);
+        $query = Offer::with(['category', 'types', 'rating']);
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -40,7 +42,8 @@ class OfferController extends Controller
     {
         $categories = OfferCategory::active()->get();
         $types = OfferType::all();
-        return view('offers.create', compact('categories', 'types'));
+        $ratings = Rating::all();
+        return view('offers.create', compact('categories', 'types', 'ratings'));
     }
 
     /**
@@ -52,6 +55,7 @@ class OfferController extends Controller
             'title' => 'required|string|max:255',
             'offer_category_id' => 'required|exists:offer_categories,id',
             'offer_type_id' => 'required|exists:offer_types,id',
+            'rating_id' => 'nullable|exists:ratings,id',
             'status' => 'required|in:active,inactive',
             'price' => 'required|numeric|min:0',
             'offer_price' => 'nullable|numeric|min:0',
@@ -60,7 +64,7 @@ class OfferController extends Controller
             'video' => 'nullable|mimes:mp4,mov,ogg,qt|max:102400', // 100MB
             'nights' => 'required|integer|min:0',
             'days' => 'required|integer|min:0',
-            'star_rating' => 'required|integer|between:1,5',
+            'star_rating' => 'nullable|integer|between:1,5',
             'types' => 'required|array',
             'types.*' => 'exists:offer_types,id',
             'sidebar_banner_image' => 'nullable|image|max:5120',
@@ -154,7 +158,8 @@ class OfferController extends Controller
         $offer->load(['category', 'types', 'itineraries']);
         $categories = OfferCategory::active()->get();
         $types = OfferType::all();
-        return view('offers.edit', compact('offer', 'categories', 'types'));
+        $ratings = Rating::all();
+        return view('offers.edit', compact('offer', 'categories', 'types', 'ratings'));
     }
 
     /**
@@ -166,6 +171,7 @@ class OfferController extends Controller
             'title' => 'required|string|max:255',
             'offer_category_id' => 'required|exists:offer_categories,id',
             'offer_type_id' => 'required|exists:offer_types,id',
+            'rating_id' => 'nullable|exists:ratings,id',
             'status' => 'required|in:active,inactive',
             'price' => 'required|numeric|min:0',
             'offer_price' => 'nullable|numeric|min:0',
@@ -174,7 +180,7 @@ class OfferController extends Controller
             'video' => 'nullable|mimes:mp4,mov,ogg,qt|max:102400',
             'nights' => 'required|integer|min:0',
             'days' => 'required|integer|min:0',
-            'star_rating' => 'required|integer|between:1,5',
+            'star_rating' => 'nullable|integer|between:1,5',
             'types' => 'required|array',
             'itineraries' => 'required|array|min:1',
             'inclusions' => 'nullable|array',
