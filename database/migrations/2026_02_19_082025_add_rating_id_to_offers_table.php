@@ -11,7 +11,13 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('offers', function (Blueprint $table) {
-            $table->foreignId('rating_id')->nullable()->constrained('ratings')->nullOnDelete();
+            if (!Schema::hasColumn('offers', 'rating_id')) {
+                $table->unsignedBigInteger('rating_id')->nullable()->after('offer_type_id');
+            }
+        });
+
+        Schema::table('offers', function (Blueprint $table) {
+            $table->foreign('rating_id')->references('id')->on('ratings')->nullOnDelete();
         });
     }
 
