@@ -27,8 +27,9 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::table('offers', function (Blueprint $table) {
-            $table->dropForeign(['rating_id']);
-            $table->dropColumn('rating_id');
+            if (Schema::hasColumn('offers', 'rating_id')) {
+                $table->dropColumn('rating_id');
+            }
         });
     }
 };

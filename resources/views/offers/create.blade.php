@@ -569,10 +569,11 @@
             </div>
 
             <!-- Rating Modal -->
-            <div x-show="showRatingModal"
-                class="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
+            <!-- Rating Modal -->
+            <div x-show="showRatingModal" x-transition
+                class="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm">
                 <div @click.away="showRatingModal = false"
-                    class="bg-white w-full max-w-md rounded-[2.5rem] p-10 shadow-2xl animate-in zoom-in-95 duration-300">
+                    class="bg-white w-full max-w-md rounded-[2.5rem] p-10 shadow-2xl">
                     <h3 class="text-2xl font-black text-slate-900">Create New Rating</h3>
                     <p class="text-slate-400 text-sm font-bold mt-2">Example: 5 Stars, Excellent, etc.</p>
                     <div class="mt-8 space-y-6">
