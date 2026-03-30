@@ -1,5 +1,6 @@
 <x-app-layout>
     <script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
+    <script>CKEDITOR.config.versionCheck = false;</script>
     <div x-data="offerManager()" class="space-y-10 animate-in fade-in duration-700 pb-20">
         <!-- Header -->
         <div class="flex items-center gap-6">
