@@ -34,7 +34,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('reviews', \App\Http\Controllers\ReviewController::class);
     Route::resource('visas', \App\Http\Controllers\VisaController::class);
     Route::resource('hotels', \App\Http\Controllers\HotelController::class);
-    Route::post('hotel-types', [\App\Http\Controllers\HotelTypeController::class, 'store'])->name('hotel-types.store');
+    Route::resource('hotel-types', \App\Http\Controllers\HotelTypeController::class);
     Route::get('settings', [\App\Http\Controllers\GeneralSettingController::class, 'index'])->name('settings.index');
     Route::post('settings', [\App\Http\Controllers\GeneralSettingController::class, 'update'])->name('settings.update');
     Route::post('provinces', [\App\Http\Controllers\ProvinceController::class, 'store'])->name('provinces.store');

@@ -188,7 +188,7 @@
                     <label class="text-xs font-black text-slate-400 uppercase tracking-widest px-1">Meta Description
                         (SEO)</label>
                     <textarea name="meta_description" rows="3"
-                        class="w-full px-6 py-4 bg-slate-50 border-transparent rounded-2xl font-bold text-slate-900 focus:bg-white focus:border-[#0F4A3B]/20 outline-none transition-all">{{ $offer->meta_description }}</textarea>
+                        class="w-full px-6 py-4 bg-slate-50 border-transparent rounded-2xl font-bold text-slate-900 focus:bg-white focus:border-[#0F4A3B]/20 outline-none transition-all ckeditor">{{ $offer->meta_description }}</textarea>
                 </div>
             </div>
 
@@ -696,11 +696,6 @@
             // Initialize CKEditor
             window.onload = function () {
                 CKEDITOR.replaceAll('ckeditor');
-
-                // For dynamic itinerary descriptions, we might need a observer or just regular textareas if they are too many
-                // But CKEditor standard replaceAll works for existing ones. 
-                // For dynamic ones added via Alpine, we might need to stick to standard textareas or a different approach.
-                // I'll keep it simple for now as requested.
             }
         </script>
 </x-app-layout>

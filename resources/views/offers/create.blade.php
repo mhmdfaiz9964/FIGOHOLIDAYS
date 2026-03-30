@@ -187,7 +187,7 @@
                     <label class="text-xs font-black text-slate-400 uppercase tracking-widest px-1">Meta Description
                         (SEO)</label>
                     <textarea name="meta_description" rows="3"
-                        class="w-full px-6 py-4 bg-slate-50 border-transparent rounded-2xl font-bold text-slate-900 focus:bg-white focus:border-[#0F4A3B]/20 outline-none transition-all"
+                        class="w-full px-6 py-4 bg-slate-50 border-transparent rounded-2xl font-bold text-slate-900 focus:bg-white focus:border-[#0F4A3B]/20 outline-none transition-all ckeditor"
                         placeholder="Enter keywords and package summary..."></textarea>
                 </div>
             </div>

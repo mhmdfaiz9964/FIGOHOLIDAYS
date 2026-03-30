@@ -145,6 +145,17 @@ class ApiController extends Controller
                         return $this->getFullUrl($img);
                     }, $itinerary->images);
                 }
+                
+                // Format Activity Icons
+                if (is_array($itinerary->activities)) {
+                    $itinerary->activities = array_map(function ($act) {
+                        if (isset($act['icon'])) {
+                            $act['icon'] = $this->getFullUrl($act['icon']);
+                        }
+                        return $act;
+                    }, $itinerary->activities);
+                }
+                
                 return $itinerary;
             });
         }
