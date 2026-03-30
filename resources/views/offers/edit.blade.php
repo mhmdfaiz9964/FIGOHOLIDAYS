@@ -16,7 +16,7 @@
         </div>
 
         <form action="{{ route('offers.update', $offer) }}" method="POST" enctype="multipart/form-data"
-            @submit="isUploading = true" class="space-y-12">
+            @submit="for(var i in CKEDITOR.instances) { CKEDITOR.instances[i].updateElement(); } isUploading = true" class="space-y-12">
             @csrf
             @method('PUT')
 
@@ -694,8 +694,10 @@
             }
 
             // Initialize CKEditor
-            window.onload = function () {
-                CKEDITOR.replaceAll('ckeditor');
-            }
+            document.addEventListener("DOMContentLoaded", function() {
+                if (typeof CKEDITOR !== 'undefined') {
+                    CKEDITOR.replaceAll('ckeditor');
+                }
+            });
         </script>
 </x-app-layout>
