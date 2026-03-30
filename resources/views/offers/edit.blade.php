@@ -1,5 +1,5 @@
 <x-app-layout>
-    <script src="https://cdn.ckeditor.com/4.25.1-lts/full/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
     <div x-data="offerManager()" class="space-y-10 animate-in fade-in duration-700 pb-20">
         <!-- Header -->
         <div class="flex items-center gap-6">
@@ -16,7 +16,7 @@
         </div>
 
         <form action="{{ route('offers.update', $offer) }}" method="POST" enctype="multipart/form-data"
-            @submit="for(var i in CKEDITOR.instances) { CKEDITOR.instances[i].updateElement(); } isUploading = true" class="space-y-12">
+            @submit="Object.keys(CKEDITOR.instances).forEach(i => CKEDITOR.instances[i].updateElement()); isUploading = true" class="space-y-12">
             @csrf
             @method('PUT')
 
@@ -693,11 +693,6 @@
                 }
             }
 
-            // Initialize CKEditor
-            document.addEventListener("DOMContentLoaded", function() {
-                if (typeof CKEDITOR !== 'undefined') {
-                    CKEDITOR.replaceAll('ckeditor');
-                }
-            });
+            // CKEditor auto-initializes elements with class 'ckeditor'
         </script>
 </x-app-layout>
