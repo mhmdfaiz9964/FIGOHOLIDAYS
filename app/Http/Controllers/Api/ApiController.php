@@ -163,7 +163,9 @@ class ApiController extends Controller
                 'location' => $hotel->location,
                 'category' => $hotel->hotel_type_id, // Keep ID for matching if needed
                 'hotel_type' => [
-                    'title' => $hotel->hotelType ? $hotel->hotelType->name : 'فنادق 5 نجوم'
+                    'id' => $hotel->hotelType ? $hotel->hotelType->id : null,
+                    'title' => $hotel->hotelType ? $hotel->hotelType->name : 'فنادق 5 نجوم',
+                    'slug' => $hotel->hotelType ? $hotel->hotelType->slug : null,
                 ],
                 'stars' => (int) $hotel->rating,
                 'pricePerNight' => (float) $hotel->price_per_night,

@@ -273,6 +273,8 @@ class OfferController extends Controller
                             // Delete old icon if exists
                             if (isset($act['old_icon']))
                                 Storage::disk('public')->delete($act['old_icon']);
+                        } elseif (isset($act['old_icon'])) {
+                            $actItem['icon'] = $act['old_icon'];
                         } elseif (isset($act['icon'])) {
                             $actItem['icon'] = $act['icon'];
                         }
