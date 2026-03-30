@@ -64,7 +64,7 @@ class OfferController extends Controller
             'video' => 'nullable|mimes:mp4,mov,ogg,qt|max:102400', // 100MB
             'nights' => 'required|integer|min:0',
             'days' => 'required|integer|min:0',
-            'star_rating' => 'nullable|integer|between:1,5',
+            'star_rating' => 'required|integer|between:1,5',
             'types' => 'required|array',
             'types.*' => 'exists:offer_types,id',
             'sidebar_banner_image' => 'nullable|image|max:5120',
@@ -180,7 +180,7 @@ class OfferController extends Controller
             'video' => 'nullable|mimes:mp4,mov,ogg,qt|max:102400',
             'nights' => 'required|integer|min:0',
             'days' => 'required|integer|min:0',
-            'star_rating' => 'nullable|integer|between:1,5',
+            'star_rating' => 'required|integer|between:1,5',
             'types' => 'required|array',
             'itineraries' => 'required|array|min:1',
             'inclusions' => 'nullable|array',

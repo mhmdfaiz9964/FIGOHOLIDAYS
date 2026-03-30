@@ -1,5 +1,5 @@
 <x-app-layout>
-    <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/4.25.1-lts/standard/ckeditor.js"></script>
     <div x-data="offerManager()" class="space-y-10 animate-in fade-in duration-700 pb-20">
         <!-- Header -->
         <div class="flex items-center gap-6">
@@ -143,7 +143,17 @@
                                     x-text="rating.name"></option>
                             </template>
                         </select>
-                        <input type="hidden" name="star_rating" value="">
+                        <div class="mt-4 space-y-2">
+                            <label class="text-xs font-black text-slate-400 uppercase tracking-widest px-1">Star Rating (1-5)</label>
+                            <select name="star_rating" required
+                                class="w-full px-6 py-4 bg-slate-50 border-transparent rounded-2xl font-bold text-slate-900 focus:bg-white focus:border-[#0F4A3B]/20 outline-none transition-all appearance-none">
+                                <option value="5" {{ $offer->star_rating == 5 ? 'selected' : '' }}>5 Stars (Excellent)</option>
+                                <option value="4" {{ $offer->star_rating == 4 ? 'selected' : '' }}>4 Stars (Very Good)</option>
+                                <option value="3" {{ $offer->star_rating == 3 ? 'selected' : '' }}>3 Stars (Good)</option>
+                                <option value="2" {{ $offer->star_rating == 2 ? 'selected' : '' }}>2 Stars (Fair)</option>
+                                <option value="1" {{ $offer->star_rating == 1 ? 'selected' : '' }}>1 Star (Budget)</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 

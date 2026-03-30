@@ -94,8 +94,9 @@ class ApiController extends Controller
         $categories = OfferCategory::with('types')->get()->map(function ($cat) {
             return [
                 'id' => $cat->id,
+                'name' => $cat->name,
                 'title' => $cat->title,
-                'description' => $cat->sub_heading,
+                'description' => $cat->sub_heading ?: $cat->title,
                 'image' => $this->getFullUrl($cat->banner_image),
                 'types' => $cat->types->map(function ($type) {
                     return [
